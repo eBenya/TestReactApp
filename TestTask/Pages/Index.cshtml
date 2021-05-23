@@ -1,0 +1,121 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div>
+    <form method="post" name="UserActivity">
+        <input id="userIdInput" type="number" value="" placeholder="UserID" name="userId" />
+        <input type="date" value="" placeholder="date" name="date" />
+
+        <label>
+            Is Register Date:<input id="isRegisterUser" type="checkbox" checked="checked" placeholder="Is Register Date" name="IsRegisterDate" />
+        </label>
+        <input type="submit" value="Add" />
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>UserId</th>
+                <th>RegisterDate</th>
+                <th>LastActivityDate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userView in Model.UsersView)
+            {
+                foreach (var lastActivity in userView.DateLastActivitys)
+                {
+                    <tr>
+                        <td>@userView.Id</td>
+                        <td>@userView.DateRegistration.ToShortDateString()</td>
+                        <td>@lastActivity.ToShortDateString()</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<canvas id="myChart" width="400" height="400"></canvas>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
+<script>
+    var userData = @Json.Serialize(Model.UsersView);
+
+    //sort
+    for (let i = 0; i < userData.length; i++) {
+        userData[0].dateLastActivitys.sort(function (a,b) {
+            if (a.name > b.name) {
+                return 1;
+            }
+            if (a.name < b.name) {
+                return -1;
+            }
+            // a должно быть равным b
+            return 0;
+        });
+    }
+
+    var users = userData.map(i => ({
+        id: i.id,
+        lifeTime: (new Date(i.dateLastActivitys[i.dateLastActivitys.length - 1])
+            - new Date(i.dateLastActivitys[0])) / 1000 / 60 / 60 / 24
+    }));
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: users.map(i=>'user'+i.id),
+            datasets: [{
+                label: 'lifeCycle',
+                data: users.map(i => i.lifeTime == 0 ? 1 : i.lifeTime),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#isRegisterUser').click(function () {
+            if ($(this).is(':checked')) {
+                $('#userIdInput').show(100);
+            } else {
+                $('#userIdInput').hide(100);
+            }
+        });
+    });
+</script>
