@@ -89,7 +89,7 @@ class UserActivityForm extends React.Component {
 class UserLifeCycleGystogram extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { usersActivity: [] };
+        this.state = { usersActivity: this.props.usersData };
     }
 
     componentDidMount() {
@@ -101,7 +101,14 @@ class UserLifeCycleGystogram extends React.Component {
         document.body.appendChild(script);
     }
 
+
     render() {
+        var users = this.state.usersActivity.map(i => ({
+            id: i.userId,
+            lifeTime: Math.abs(((new Date(i.dateRegistration)
+                - new Date(i.dateLastActivity)) / 1000 / 60 / 60 / 24))
+        }));
+
         return (
             <div>
                 <canvas id="myChart" width="400" height="200"></canvas>
@@ -193,7 +200,7 @@ class UsersActivityList extends React.Component {
                 </div>
                 <div>
                     <h3>RenderGistogram:</h3>
-                    <UserLifeCycleGystogram usersActivity={this.state.usersActivity} />
+                    <UserLifeCycleGystogram usersData={this.state.usersActivity} />
                 </div>
             </div>
         );
