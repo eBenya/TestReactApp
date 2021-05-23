@@ -15,35 +15,37 @@ namespace TestTask.Controllers
     public class UserController : Controller
     {
         private ApplicationContext db;
+        
         public UserController(ApplicationContext dbContext)
         {
             this.db = dbContext;
         }
+        
         [HttpGet]
-        public IEnumerable<UserReactView> Get()
+        public IEnumerable<UserView> Get()
         {
-            return UserHelpers.GetUserReactView(db);
-            
-            //var temp = db.UserActivities.ToList();
-            //return temp;
+            return UserHelpers.GetUserView(db);
         }
+        
         [HttpPost]
-        public IActionResult Post(UserActivity userActivity)    // Пусть будет одна модель на два дела..
+        public IActionResult Post(UserView userActivity)    // Пусть будет одна модель на два дела..
         {
-            UserHelpers.CreateOrEditUser(userActivity.UserId, userActivity.DateLastActivity, db);
+            UserHelpers.CreateOrEditUser(userActivity, db);
 
             return Ok(userActivity);
         }
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             UserActivity userActivity = db.UserActivities.FirstOrDefault(x => x.UserId == id);
-            //data.FirstOrDefault(x => x.UserId == id);
+           
             if (userActivity == null)
             {
                 return NotFound();
             }
-
+            var user = db.Users.FirstOrDefault(x => x.Id == id);
+            db.Remove(user);
             db.Remove(userActivity);
             await db.SaveChangesAsync();
 

@@ -31,43 +31,28 @@
         <tbody>
             @foreach (var userView in Model.UsersView)
             {
-                foreach (var lastActivity in userView.DateLastActivitys)
-                {
-                    <tr>
-                        <td>@userView.Id</td>
-                        <td>@userView.DateRegistration.ToShortDateString()</td>
-                        <td>@lastActivity.ToShortDateString()</td>
-                    </tr>
-                }
+
+                <tr>
+                    <td>@userView.UserId</td>
+                    <td>@userView.DateRegistration</td>
+                    <td>@userView.DateLastActivity</td>
+                </tr>
+
             }
         </tbody>
     </table>
 </div>
 
 
-<canvas id="myChart" width="400" height="400"></canvas>
+<canvas id="myChart" width="400" height="200"></canvas>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
 <script>
     var userData = @Json.Serialize(Model.UsersView);
 
-    //sort
-    for (let i = 0; i < userData.length; i++) {
-        userData[0].dateLastActivitys.sort(function (a,b) {
-            if (a.name > b.name) {
-                return 1;
-            }
-            if (a.name < b.name) {
-                return -1;
-            }
-            // a должно быть равным b
-            return 0;
-        });
-    }
-
     var users = userData.map(i => ({
-        id: i.id,
-        lifeTime: (new Date(i.dateLastActivitys[i.dateLastActivitys.length - 1])
-            - new Date(i.dateLastActivitys[0])) / 1000 / 60 / 60 / 24
+        id: i.userId,
+        lifeTime: Math.abs(((new Date(i.dateRegistration)
+            - new Date(i.dateLastActivity)) / 1000 / 60 / 60 / 24))
     }));
 
     var ctx = document.getElementById('myChart').getContext('2d');

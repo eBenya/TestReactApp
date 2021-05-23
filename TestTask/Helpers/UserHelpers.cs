@@ -11,42 +11,65 @@ namespace TestTask.Helpers
 {
     public class UserHelpers
     {
-        public static List<UserRazorView> GetUserRazorView(ApplicationContext db)
+        public static List<UserView> GetUserView(ApplicationContext db)
         {
-            var usersView = new List<UserRazorView>();
+            var usersView = new List<UserView>();
             var users = db.Users.Include(u => u.userActivities).ToList();
             foreach (var user in users)
             {
-                usersView.Add(new UserRazorView
+                usersView.Add(new UserView
                 {
-                    Id = user.Id,
-                    DateRegistration = user.DateRegistration,
-                    DateLastActivitys = user.userActivities.Select(o => o.DateLastActivity).ToList(),
+                    UserId = user.Id,
+                    DateRegistration = user.DateRegistration.ToShortDateString(),
+                    DateLastActivity = user.userActivities.Max(o => o?.DateLastActivity)?.ToShortDateString() ?? string.Empty,
                 });
             }
             return usersView;
         }
-        public static List<UserReactView> GetUserReactView(ApplicationContext db)
+        public static void CreateOrEditUser(UserView userView, ApplicationContext db)
         {
-            var usersView = new List<UserReactView>();
-            var users = db.Users.Include(u => u.userActivities).ToList();
-            foreach (var user in users)
+            if (userView.UserId == 0)
             {
-                foreach (var ua in user.userActivities)
-                {
-                    usersView.Add(new UserReactView
-                    {
-                        UserId = user.Id,
-                        DateRegistration = user.DateRegistration,
-                        DateLastActivity = ua.DateLastActivity,
-                    });
-                }
+                CreateUser(userView, db);
             }
-            return usersView;
+            else
+            {
+                EditUser(userView, db);
+            }
         }
+
+        private static void CreateUser(UserView userView, ApplicationContext db)
+        {
+            var userActivities = new List<UserActivity>();
+            userActivities.Add(new UserActivity
+            {
+                DateLastActivity = DateTime.Parse(userView.DateLastActivity),
+            });
+            var newUser = new User
+            {
+                DateRegistration = DateTime.Parse(userView.DateRegistration),
+                userActivities = userActivities,
+            };
+
+            db.Users.Add(newUser);
+            db.UserActivities.AddRange(userActivities);
+
+            db.SaveChanges();
+        }
+
+        private static void EditUser(UserView userView, ApplicationContext db)
+        {
+            db.UserActivities.Add(new UserActivity
+            {
+                UserId = userView.UserId,
+                DateLastActivity = DateTime.Parse(userView.DateLastActivity),
+            });
+            db.SaveChanges();
+        }
+
         public static void CreateOrEditUser(int? userId, DateTime? date, ApplicationContext db)
         {
-            if(userId == null || userId == 0)
+            if (userId == null || userId == 0)
             {
                 CreateUser(userId, date, db);
             }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace TestTask.Models
 {
-    public class UserReactView
+    public class UserView
     {
         public int UserId { get; set; }
-        public DateTime DateRegistration { get; set; }
-        public DateTime DateLastActivity { get; set; }
+        public string DateRegistration { get; set; }
+        public string DateLastActivity { get; set; }
     }
 }

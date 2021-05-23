@@ -16,17 +16,17 @@ namespace TestTask.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private ApplicationContext db;
-        public List<UserRazorView> UsersView { get; set; }
+        public List<UserView> UsersView { get; set; }
         public IndexModel(ILogger<IndexModel> logger, ApplicationContext db)
         {
             _logger = logger;
             this.db = db;
-            UsersView = new List<UserRazorView>();
+            UsersView = new List<UserView>();
         }
 
         public void OnGet()
         {
-            UsersView = UserHelpers.GetUserRazorView(db);
+            UsersView = UserHelpers.GetUserView(db);
         }
 
         public IActionResult OnPost(int? userId, DateTime? date)

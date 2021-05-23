@@ -32,7 +32,7 @@
 class UserActivityForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {userId: '', dateRegistration: '', dateLastActivity: '' };
+        this.state = { userId: '', dateRegistration: '', dateLastActivity: '' };
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onUserIdChange = this.onUserIdChange.bind(this);
@@ -86,6 +86,31 @@ class UserActivityForm extends React.Component {
     }
 }
 
+class UserLifeCycleGystogram extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { usersActivity: [] };
+    }
+
+    componentDidMount() {
+        const script = document.createElement("script");
+
+        script.src = "https://localhost:44389//js/gistogramScript.js";
+        script.async = true;
+
+        document.body.appendChild(script);
+    }
+
+    render() {
+        return (
+            <div>
+                <canvas id="myChart" width="400" height="200"></canvas>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
+            </div>
+        );
+    }
+}
+
 class UsersActivityList extends React.Component {
     constructor(props) {
         super(props);
@@ -127,7 +152,7 @@ class UsersActivityList extends React.Component {
     onRemoveUserActivity(userActivity) {
 
         if (userActivity) {
-            var url = this.props.apiUrl + "/" + userActivity.id;
+            var url = this.props.apiUrl + "/" + userActivity.userId;
 
             var xhr = new XMLHttpRequest();
             xhr.open("delete", url, true);
@@ -165,6 +190,10 @@ class UsersActivityList extends React.Component {
                             }
                         </tbody>
                     </table>
+                </div>
+                <div>
+                    <h3>RenderGistogram:</h3>
+                    <UserLifeCycleGystogram usersActivity={this.state.usersActivity} />
                 </div>
             </div>
         );
