@@ -7,7 +7,7 @@ import UserActivity from "./UserActivity";
 class UsersActivityList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { usersActivity: [] };
+        this.state = { usersActivity: [], mappedUsers: [] };
 
         this.onAddUserActivity = this.onAddUserActivity.bind(this);
         this.onRemoveUserActivity = this.onRemoveUserActivity.bind(this);
@@ -59,6 +59,16 @@ class UsersActivityList extends React.Component {
             xhr.send();
         }
     }
+
+    mapUsers(users) {
+        let temp = users.map(i => ({
+            id: i.userId,
+            lifeTime: Math.abs(((new Date(i.dateRegistration)
+                - new Date(i.dateLastActivity)) / 1000 / 60 / 60 / 24))
+        }));
+        this.setState({ mappedUsers: temp }); 
+    }
+
     render() {
 
         var remove = this.onRemoveUserActivity;
@@ -87,14 +97,15 @@ class UsersActivityList extends React.Component {
                 </div>
                 <div>
                     <h3>RenderGistogram:</h3>
+                    <button onClick={() => this.mapUsers(this.state.usersActivity) }>Render</button>
                     <div>
                         <Bar
                             data={{
-                                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                                labels: this.state.mappedUsers.map(i => 'user' + i.id), //['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                                 datasets: [
                                     {
                                         label: '# of votes',
-                                        data: [12, 19, 3, 5, 2, 3],
+                                        data: this.state.mappedUsers.map(i => i.lifeTime == 0 ? 1 : i.lifeTime),//[12, 19, 3, 5, 2, 3],
                                         backgroundColor: [
                                             'rgba(255, 99, 132, 0.2)',
                                             'rgba(54, 162, 235, 0.2)',
@@ -121,8 +132,8 @@ class UsersActivityList extends React.Component {
                                     // },
                                 ],
                             }}
-                            width={100}
-                            height={50}
+                            width={300}
+                            height={200}
                             options={{
                                 maintainAspectRatio: false,
                                 scales: {

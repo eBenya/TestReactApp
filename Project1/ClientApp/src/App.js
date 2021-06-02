@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { FetchData } from './components/FetchData';
 import { Counter } from './components/Counter';
+import { Bar } from 'react-chartjs-2';
 
 import UsersActivityList from './CustomComponents/UserActivityList';
 
@@ -14,7 +15,7 @@ export default class App extends Component {
 
     render() {
         return (
-            <Layout>
+            <Layout>             
                 <UsersActivityList apiUrl="/api/user" />
                 {/*//  <Route exact path='/' component={Home} />*/}
                 {/*//  <Route path='/counter' component={Counter} />*/}
